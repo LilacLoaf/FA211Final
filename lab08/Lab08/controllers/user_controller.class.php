@@ -37,6 +37,10 @@ class UserController
                     <input type='email' name='email' required><br><br>
                     <label>Password:</label><br>
                     <input type='password' name='password' required><br><br>
+                    <label>First Name:</label><br>
+                    <input type='text' name='firstname' required><br><br>
+                    <label>Last Name:</label><br>
+                    <input type='text' name='lastname' required><br><br>
                     <input type='submit' class='button' value='Register'>
                 </form>
               </div>";
