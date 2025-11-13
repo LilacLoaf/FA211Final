@@ -33,14 +33,19 @@ class UserController
                 <form method='post' action='?action=processRegister'>
                     <label>Username:</label><br>
                     <input type='text' name='username' required><br><br>
+
                     <label>Email:</label><br>
                     <input type='email' name='email' required><br><br>
+
                     <label>Password:</label><br>
-                    <input type='password' name='password' required><br><br>
+                    <input type='password' name='password' minlength='5' required><br><br>
+
                     <label>First Name:</label><br>
                     <input type='text' name='firstname' required><br><br>
+
                     <label>Last Name:</label><br>
                     <input type='text' name='lastname' required><br><br>
+
                     <input type='submit' class='button' value='Register'>
                 </form>
               </div>";
@@ -50,25 +55,49 @@ class UserController
     // Process registration form submission
     public function processRegister(): void
     {
-        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-        $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-        $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-        $firstname = filter_input(INPUT_POST, 'firstname', FILTER_SANITIZE_STRING);
-        $lastname = filter_input(INPUT_POST, 'lastname', FILTER_SANITIZE_STRING);
+        $userModel = UserModel::getInstance();
 
-        if (empty($username) || empty($email) || empty($password)) {
+        // Build the fullname field from first + last
+        $user_id = uniqid();
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+        $email = $_POST['email'] ?? '';
+        $firstname = $_POST['firstname'] ?? '';
+        $lastname = $_POST['lastname'] ?? '';
+        $fullname = trim("$firstname $lastname");
+
+        if (empty($username) || empty($password) || empty($email) || empty($fullname)) {
             $error = new UserError();
             $error->display("Invalid registration data. Please fill all fields.");
             return;
         }
 
-        // Still Have To: Add database insert logic here using the Database class
+        // Model requires associative array
+        $data = [
+            'user_id' => $user_id,
+            'username' => $username,
+            'password' => $password, // model hashes it
+            'fullname' => $fullname,
+            'email'    => $email,
+        ];
+
+        $success = $userModel->add_user($data);
+
         $view = new View();
         $view::header();
-        echo "<div class='middle-row'>
-                <p>Registration successful for <strong>$username</strong>!</p>
-                <p><a href='?action=login'>Click here to log in</a></p>
-              </div>";
+
+        if ($success) {
+            echo "<div class='middle-row'>
+                    <p>Registration successful for <strong>$username</strong>!</p>
+                    <p><a href='?action=login'>Click here to log in</a></p>
+                  </div>";
+        } else {
+            echo "<div class='middle-row'>
+                    <p>Registration failed. Please try again.</p>
+                    <p><a href='?action=register'>Back to registration</a></p>
+                  </div>";
+        }
+
         $view::footer();
     }
 
@@ -82,8 +111,10 @@ class UserController
                 <form method='post' action='?action=processLogin'>
                     <label>Username:</label><br>
                     <input type='text' name='username' required><br><br>
+
                     <label>Password:</label><br>
                     <input type='password' name='password' required><br><br>
+
                     <input type='submit' class='button' value='Login'>
                 </form>
               </div>";
@@ -93,8 +124,8 @@ class UserController
     // Process login form submission
     public function processLogin(): void
     {
-        $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_STRING);
-        $password = $_POST['password'];
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
 
         if (empty($username) || empty($password)) {
             $error = new UserError();
@@ -102,13 +133,86 @@ class UserController
             return;
         }
 
-        // TODO: Validate user credentials from database
+        $model = UserModel::getInstance();
+        $success = $model->verify_user($username, $password);
+
         $view = new View();
         $view::header();
-        echo "<div class='middle-row'>
-                <p>Welcome back, <strong>$username</strong>!</p>
-                <p><a href='?action=viewProfile'>View Profile</a> | <a href='?action=logout'>Logout</a></p>
-              </div>";
+
+        if ($success) {
+            echo "<div class='middle-row'>
+                    <p>Welcome back, <strong>$username</strong>!</p>
+                    <p>
+                        <a href='?action=viewProfile'>View Profile</a> |
+                        <a href='?action=reset'>Reset Password</a> |
+                        <a href='?action=logout'>Logout</a>
+                    </p>
+                  </div>";
+        } else {
+            echo "<div class='middle-row'>
+                    <p>Invalid username or password.</p>
+                    <p><a href='?action=login'>Try Again</a></p>
+                  </div>";
+        }
+
+        $view::footer();
+    }
+
+    // Password reset view
+    public function reset(): void
+    {
+        $view = new View();
+        $view::header();
+
+        if (!isset($_COOKIE['username'])) {
+            echo "<div class='middle-row'>
+                    <p>You must be logged in to reset your password.</p>
+                    <p><a href='?action=login'>Go to Login</a></p>
+                  </div>";
+        } else {
+            $username = htmlspecialchars($_COOKIE['username']);
+            echo "<div class='middle-row'>
+                    <h3>Reset Password</h3>
+                    <form method='post' action='?action=doReset'>
+                        <label>Username:</label><br>
+                        <input type='text' name='username' value='$username' readonly><br><br>
+
+                        <label>New Password:</label><br>
+                        <input type='password' minlength='5' name='password' required><br><br>
+
+                        <input type='submit' class='button' value='Reset Password'>
+                    </form>
+                  </div>";
+        }
+
+        $view::footer();
+    }
+
+    // Process password reset
+    public function doReset(): void
+    {
+        $model = UserModel::getInstance();
+
+        $username = $_POST['username'] ?? '';
+        $password = $_POST['password'] ?? '';
+
+        $success = $model->reset_password($username, $password);
+
+        $view = new View();
+        $view::header();
+
+        if ($success) {
+            echo "<div class='middle-row'>
+                    <p>Password reset successful.</p>
+                    <p><a href='?action=logout'>Logout</a></p>
+                  </div>";
+        } else {
+            echo "<div class='middle-row'>
+                    <p>Password reset failed.</p>
+                    <p><a href='?action=reset'>Try Again</a></p>
+                  </div>";
+        }
+
         $view::footer();
     }
 
@@ -127,15 +231,17 @@ class UserController
     // Handle user logout
     public function logout(): void
     {
-        session_start();
-        session_destroy();
+        $model = UserModel::getInstance();
+        $model->logout();
 
         $view = new View();
         $view::header();
+
         echo "<div class='middle-row'>
                 <p>You have been logged out successfully.</p>
                 <p><a href='?action=login'>Log in again</a></p>
               </div>";
+
         $view::footer();
     }
 
@@ -151,7 +257,7 @@ class UserController
         $view::footer();
     }
 
-    // Display a specific user detail (example extra action)
+    // Display a specific user detail
     public function showUserDetail(): void
     {
         $view = new View();
@@ -164,4 +270,5 @@ class UserController
     }
 }
 ?>
+
 
