@@ -1,26 +1,34 @@
 <?php
-
 /*
- * Author: your name
- * Date: today's date
+ * Author: Your Name
+ * Date: 2025-11-13
  * Name: index.php
- * Description: short description about this file
+ * Description: The front controller for the PeaPOD User Management System.
+ *              Routes requests based on the 'action' query string variable.
  */
 
-//include code in vendor/autoload.php file
-require_once ("vendor/autoload.php");
+// Composer autoloader (for any packages)
+require_once __DIR__ . '/vendor/autoload.php';
 
-//create an object of UserController
-$user_controller = new UserController();
+// Manually include system classes
+require_once __DIR__ . '/controllers/user_controller.class.php';
+require_once __DIR__ . '/application/database.class.php';
+require_once __DIR__ . '/models/user_model.class.php';
+require_once __DIR__ . '/views/view.class.php';
+require_once __DIR__ . '/views/error/user_error.class.php';
 
-//add your code below this line to complete this file
-
+// Grab the 'action' parameter, default to 'index'
 $action = $_GET['action'] ?? 'index';
-require_once 'user_controller.class.php';
+
+// Create the controller
 $controller = new UserController();
 
+// Dispatch to appropriate method
 if (method_exists($controller, $action)) {
-    $controller->$action();
+    $controller->$action();  // e.g., $controller->login();
 } else {
-    $controller->error();
+    $error = new UserError();
+    $error->display("The requested action '$action' is not valid.");
 }
+?>
+
