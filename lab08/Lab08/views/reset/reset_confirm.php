@@ -7,9 +7,12 @@
 */
 
 class ResetConfirm extends View {
+    //function that displays the password reset results
     public function display($success) {
         $this->header();
+        //message formatting
         echo '<div class="row"><div class="column middle">';
+        //displays success or failure message depending on results
         if ($success) {
             echo "<p>Password reset successful.</p><a href='index.php?action=logout'>Logout</a>";
         } else {

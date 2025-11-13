@@ -8,6 +8,7 @@
 
 class Register extends View {
     public function display($success) {
+        //displays a success or failure alert when you register
         $this->header();
         echo '<div class="row"><div class="column middle">';
         if ($success) {
