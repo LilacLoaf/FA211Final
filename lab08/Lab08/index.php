@@ -1,6 +1,6 @@
 <?php
 /*
- * Author: Your Name
+ * Author: Paxton Ducy
  * Date: 2025-11-13
  * Name: index.php
  * Description: The front controller for the PeaPOD User Management System.
@@ -18,7 +18,7 @@ require_once __DIR__ . '/views/view.class.php';
 require_once __DIR__ . '/views/error/user_error.class.php';
 
 // Grab the 'action' parameter, default to 'index'
-$action = $_GET['action'] ?? 'index';
+$action = $_GET['action'] ?? 'register';
 
 // Create the controller
 $controller = new UserController();
