@@ -8,7 +8,7 @@ class CarsController{
         $this->carsModel = CarsModel::getModel();
     }
 
-    //create a base screen to put the tables onto - copied from practice 12
+    //create a base screen to put the tables onto - copied from practice 12         *
     public function index(): void{
         $list = $this->carsModel->getCars();
 
@@ -17,26 +17,49 @@ class CarsController{
     }
 
     //display the cars table
-    public function getCars(){
-        $listCars = $this->carsModel->getCars();
+    public function listCars(){
+        $getCars = $this->carsModel->getCars();
 
         $view = new carIndex();
-        $view->display($listCars);
+        $view->display($getCars);
     }
     //get the users table
-    public function getUsers(){
-        $listUsers = $this->carsModel->getUsers();
+    public function listUsers(){
+        $getUsers = $this->carsModel->getUsers();
 
         $view = new userIndex();
-        $view->display($listUsers);
+        $view->display($getUsers);
     }
     //get the junction table (the extra table)
-    public function getJunction(){
-        $listJunction = $this->carsModel->getJunction();
+    public function listJunction(){
+        $getJunction = $this->carsModel->getJunction();
 
         $view = new junctionIndex();
-        $view->display($listJunction);
+        $view->display($getJunction);
     }
 
+    //get the car details using its id and send the page into a acr detail page
+    public function listCarByID($id){
+        $car = $this->carsModel->getCarByID($id);
 
+        $view = new carDetail();
+        $view->display($car);
+
+    }
+
+    //get the junction table's details.
+    public function listJunctionByID($id){
+        $junction = $this->carsModel->getJunctionByID($id);
+
+        $view = new junctionDetail();
+        $view->display($junction);
+    }
+
+    //get the user table's details
+    public function listUserByID($id){
+        $user = $this->carsModel->getUserByID($id);
+
+        $view = new userDetail();
+        $view->display($user);
+    }
 }
