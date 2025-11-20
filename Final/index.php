@@ -1,42 +1,19 @@
 <?php
 
-class CarsController{
-    private CarsModel $carsModel;
+//temporary require statements
+require_once('C:\xampp\htdocs\I211\final\controller\controller.php');
 
-    //access the model page
-    public function __construct(){
-        $this->carsModel = CarsModel::getModel();
-    }
+//make the controller
+$controller = new CarsController();
 
-    //create a base screen to put the tables onto - copied from practice 12
-    public function index(): void{
-        $list = $this->carsModel->getCars();
+//get the method, if there is no method list everything -- probably make a homepage later?
+$action = $_GET['action'] ?? 'index';
 
-        $view = new Index();
-        $view->display();
-    }
-
-    //display the cars table
-    public function getCars(){
-        $listCars = $this->carsModel->getCars();
-
-        $view = new carIndex();
-        $view->display($listCars);
-    }
-    //get the users table
-    public function getUsers(){
-        $listUsers = $this->carsModel->getUsers();
-
-        $view = new userIndex();
-        $view->display($listUsers);
-    }
-    //get the junction table (the extra table)
-    public function getJunction(){
-        $listJunction = $this->carsModel->getJunction();
-
-        $view = new junctionIndex();
-        $view->display($listJunction);
-    }
-
-
+//if the action exists, get it from the controller
+if(method_exists($controller, $action)) {
+    $controller->$action();
+} else {
+    //if it doesn't, throw an error -- errors aren't setup yet
+    $error = new UserError();
+    $error->display("the requested action: '$action' does not exist");
 }
