@@ -18,7 +18,9 @@ if (!isset($_GET['id'])) {
 $id = intval($_GET['id']);
 
 // THIS IS TEMPORARY CHANGE THIS WHEN THE MODEL CONTROLLER ARE DONE
-$conn = new mysqli("localhost", "root", "", "rental_cars");
+//$conn = new mysqli("localhost", "root", "", "rental_cars");
+$conn = new mysqli('127.0.0.1', 'root', '', 'rental_cars');
+
 if ($conn->connect_error) die("Database connection failed");
 
 // Prepared statement prevents invalid or unsafe input

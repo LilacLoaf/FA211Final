@@ -4,17 +4,19 @@
     <h3>Search Results:</h3>
     <table border="1">
         <tr>
-            <th>Name</th>
-            <th>Type</th>
+            <th>Make</th>
+            <th>Model</th>
             <th>Color</th>
-            <th>Price</th>
+            <th>Plate</th>
+            <th>Status</th>
         </tr>
         <?php foreach ($vehicles as $vehicle): ?>
             <tr>
-                <td><a href="index.php?action=view_detail&id=<?= $vehicle['id']; ?>"><?= $vehicle['name']; ?></a></td>
-                <td><?= $vehicle['type']; ?></td>
+                <td><?= $vehicle['make']; ?></td>
+                <td><?= $vehicle['model']; ?></td>
                 <td><?= $vehicle['color']; ?></td>
-                <td><?= $vehicle['price']; ?></td>
+                <td><?= $vehicle['plate']; ?></td>
+                <td><?= $vehicle['status']; ?></td>
             </tr>
         <?php endforeach; ?>
     </table>
