@@ -43,7 +43,7 @@ $conn->close();
         const query = document.getElementById('search-query').value;
         const mode = document.querySelector('input[name="mode"]:checked').value;
 
-        fetch(`../controller/car_controller.class.php?action=search&query=${encodeURIComponent(query)}&mode=${mode}`)
+        fetch(`../index.php?action=search&query=${encodeURIComponent(query)}&mode=${mode}`)
             .then(response => response.text())
             .then(html => {
                 document.getElementById('search-results').innerHTML = html;
