@@ -53,6 +53,11 @@ class VehicleView {
         // Navigation link helps users return to the full list
         echo "<a href='all_vehicles.php'>Back to list</a>";
     }
+
+    public function showSearchResults($vehicles) {
+        include "view/search_results.php";
+    }
+
 }
 
 
