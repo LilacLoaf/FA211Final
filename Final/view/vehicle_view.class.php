@@ -19,9 +19,9 @@ class VehicleView {
         foreach ($vehicles as $v) {
             echo "<tr>
                 <td>{$v['id']}</td>
-                <td>{$v['brand']}</td>
+                <td>{$v['make']}</td>
                 <td>{$v['model']}</td>
-                <td>{$v['licensePlate']}</td>
+                <td>{$v['plate']}</td>
                 <td>{$v['status']}</td>
 
                 <!-- Link allows user to view details of this vehicle -->
@@ -44,9 +44,9 @@ class VehicleView {
         // Simple list layout to make details easy to read
         echo "<h2>Vehicle Detail</h2><ul>";
         echo "<li><strong>ID:</strong> {$vehicle['id']}</li>";
-        echo "<li><strong>Brand:</strong> {$vehicle['brand']}</li>";
+        echo "<li><strong>make:</strong> {$vehicle['make']}</li>";
         echo "<li><strong>Model:</strong> {$vehicle['model']}</li>";
-        echo "<li><strong>License Plate:</strong> {$vehicle['licensePlate']}</li>";
+        echo "<li><strong>License Plate:</strong> {$vehicle['plate']}</li>";
         echo "<li><strong>Status:</strong> {$vehicle['status']}</li>";
         echo "</ul>";
 

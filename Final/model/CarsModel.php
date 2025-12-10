@@ -18,7 +18,9 @@ class CarsModel {
 
     // Singleton pattern
     private function __construct() {
-        $this->db = new mysqli($this->host, $this->user, $this->pass, $this->dbname);
+        //$this->db = new mysqli($this->host, $this->user, $this->pass, $this->dbname);
+        $this->db = new mysqli('127.0.0.1', 'root', '', 'rental_cars');
+
 
         if ($this->db->connect_error) {
             die("Database connection failed: " . $this->db->connect_error);
@@ -42,24 +44,26 @@ class CarsModel {
     }
 
     // Search cars by keyword(s) with AND/OR
-    public function searchCars(string $query, string $mode = 'AND'): array {
+    public function searchCars(string $query): array {
         $keywords = array_filter(explode(" ", trim($query)));
         if (empty($keywords)) return [];
 
-        $connector = strtoupper($mode) === 'OR' ? 'OR' : 'AND';
-
         $where = array_map(function ($word) {
             $word = $this->db->real_escape_string($word);
-            return "name LIKE '%$word%'";
+            return "(make LIKE '%$word%' OR model LIKE '%$word%' OR color LIKE '%$word%' OR plate LIKE '%$word%' OR status LIKE '%$word%')";
         }, $keywords);
 
-        $sql = "SELECT * FROM vehicles WHERE " . implode(" $connector ", $where);
+        $sql = "SELECT * FROM vehicles WHERE " . implode(" OR ", $where);
         $result = $this->db->query($sql);
 
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
-    // Placeholder for getUsers (for completeness)
+
+
+
+
+    // Placeholder for getUsers
     public function getUsers(): array {
         $query = "SELECT * FROM users";
         $result = $this->db->query($query);

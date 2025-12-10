@@ -3,8 +3,11 @@
  * Author: Paxton Ducy
  * Date: 11/20/2025
  * Name: car_controller.class.php
- * Description: creates the classes for the vehicles
+ * Description: Controls routing logic for car-related views and actions
  */
+
+require_once __DIR__ . '/../model/CarsModel.php';
+require_once __DIR__ . '/../view/carSearchResults.class.php';
 
 class CarsController {
     private CarsModel $carsModel;
@@ -55,10 +58,11 @@ class CarsController {
         $view->display($user);
     }
 
-    //searchCars for AJAX search
-    public function searchCars($query, $mode = 'AND') {
-        $results = $this->carsModel->searchCars($query, $mode);
-        $view = new carSearchResults(); // this view should output a table or list
+    //Search Method
+    public function searchCars($query) {
+        $results = $this->carsModel->searchCars($query);
+        $view = new carSearchResults(); // this outputs a table for AJAX
         $view->display($results);
     }
 }
+
