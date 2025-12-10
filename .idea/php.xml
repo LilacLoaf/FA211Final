@@ -13,6 +13,8 @@
   <component name="PhpIncludePathManager">
     <include_path>
       <path value="$PROJECT_DIR$/Nicks/Final/vendor/composer" />
+      <path value="$PROJECT_DIR$/FinalN/Final/vendor/composer" />
+      <path value="$PROJECT_DIR$/FinalJ/vendor/composer" />
     </include_path>
   </component>
   <component name="PhpProjectSharedConfiguration" php_language_level="8.4" />

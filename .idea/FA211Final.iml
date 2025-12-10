@@ -2,6 +2,8 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/FinalJ/vendor/composer" />
+      <excludeFolder url="file://$MODULE_DIR$/FinalN/Final/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/Nicks/Final/vendor/composer" />
     </content>
     <orderEntry type="inheritedJdk" />

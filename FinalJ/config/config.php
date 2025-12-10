@@ -6,4 +6,4 @@
  * Description:
  */
 
-define("BASE_URL", "http://localhost/I211/Final");
+define("BASE_URL", "http://localhost/FA211Final/FinalJ");

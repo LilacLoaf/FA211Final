@@ -21,6 +21,7 @@ class WelcomeView
 
         <a href="<?php echo BASE_URL; ?>/index.php/cars/listCars">View All Vehicles</a><br>
 
+
         </body>
         </html>
         <?php

@@ -14,22 +14,19 @@ class CarsModel {
 
     // table names
     private string $tblVehicles;
-    private string $tblUsers;
-    private string $tblJunction;
+//    private string $tblUsers;
+//    private string $tblJunction;
 
-    // private constructor for singleton
     private function __construct() {
 
-        // IMPORTANT: use Database::getDatabase() instead of new Database()
         $this->db = Database::getDatabase();
         $this->conn = $this->db->getConnection();
 
         // get table names from Database class
         $this->tblVehicles = $this->db->getVehiclesTable();
-        $this->tblUsers    = $this->db->getUsersTable();
-        $this->tblJunction = $this->db->getJunctionTable();
+//        $this->tblUsers    = $this->db->getUsersTable();
+//        $this->tblJunction = $this->db->getJunctionTable();
 
-        // sanitize POST and GET
         foreach ($_POST as $key => $value) {
             $_POST[$key] = $this->conn->real_escape_string($value);
         }
@@ -38,7 +35,6 @@ class CarsModel {
         }
     }
 
-    // singleton accessor
     public static function getModel(): CarsModel
     {
         if (self::$_instance === null) {
@@ -46,11 +42,6 @@ class CarsModel {
         }
         return self::$_instance;
     }
-
-    /* ============================
-       VEHICLE METHODS
-       ============================ */
-
     public function getCars(): array|false
     {
         $sql = "SELECT * FROM $this->tblVehicles";
@@ -75,44 +66,6 @@ class CarsModel {
             : false;
     }
 
-    /* ============================
-       USER METHODS
-       ============================ */
-
-    public function getUsers(): array|false
-    {
-        $sql = "SELECT * FROM $this->tblUsers";
-        $result = $this->conn->query($sql);
-
-        if (!$result) return false;
-
-        $users = [];
-        while ($row = $result->fetch_assoc()) {
-            $users[] = $row;
-        }
-        return $users;
-    }
-
-    public function getUserByID($id): array|false
-    {
-        $sql = "SELECT * FROM $this->tblUsers WHERE id='$id' LIMIT 1";
-        $result = $this->conn->query($sql);
-
-        return ($result && $result->num_rows > 0)
-            ? $result->fetch_assoc()
-            : false;
-    }
-
-    public function getJunctionByID($id): array|false
-    {
-        $sql = "SELECT * FROM $this->tblJunction WHERE id='$id' LIMIT 1";
-        $result = $this->conn->query($sql);
-
-        return ($result && $result->num_rows > 0)
-            ? $result->fetch_assoc()
-            : false;
-    }
-
     public function searchCars(string $query, string $mode = 'AND'): array {
         $keywords = array_filter(explode(" ", trim($query)));
         if (empty($keywords)) return [];
@@ -121,8 +74,8 @@ class CarsModel {
 
         $where = array_map(function ($word) {
             $word = $this->conn->real_escape_string($word);
-            return "(brand LIKE '%$word%' 
-                 OR model LIKE '%$word%' 
+            return "(brand LIKE '%$word%'
+                 OR model LIKE '%$word%'
                  OR licensePlate LIKE '%$word%')";
         }, $keywords);
 
@@ -132,5 +85,13 @@ class CarsModel {
         return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
     }
 
+    public function insertCar(string $brand, string $model, string $licensePlate, string $status = 'Available'): bool
+    {
+        $stmt = $this->conn->prepare(
+            "INSERT INTO $this->tblVehicles (brand, model, licensePlate, status) VALUES (?, ?, ?, ?)"
+        );
+        $stmt->bind_param("ssss", $brand, $model, $licensePlate, $status);
+        return $stmt->execute();
+    }
 
 }
