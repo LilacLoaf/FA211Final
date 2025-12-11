@@ -23,6 +23,7 @@ class WelcomeView
         <a href="<?php echo BASE_URL; ?>/index.php/users/signin">Sign into your account</a><br>
 
 
+
         </body>
         </html>
         <?php

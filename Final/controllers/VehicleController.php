@@ -39,41 +39,4 @@ class VehicleController
         $vehicle = $this->model->getVehicleById($id);
         $this->view->showVehicleDetail($vehicle);
     }
-
-    //add vehicle function
-    public function create()
-    {
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // Collect data from POST request
-            $make = $_POST['make'] ?? '';
-            $model = $_POST['model'] ?? '';
-            $year = $_POST['year'] ?? '';
-            $color = $_POST['color'] ?? '';
-
-            // Optional: basic validation
-            if (empty($make) || empty($model) || empty($year)) {
-                $this->view->showCreateForm("Please fill in all required fields.");
-                return;
-            }
-
-            // Create new vehicle using model
-            $vehicleData = [
-                'make' => $make,
-                'model' => $model,
-                'year' => $year,
-                'color' => $color
-            ];
-
-            $this->model->addVehicle($vehicleData);
-
-            // Redirect to vehicle list after creation
-            header("Location: /vehicles");
-            exit;
-        } else {
-            // Show the create form
-            $this->view->showCreateForm();
-        }
-
-
-    }
 }
