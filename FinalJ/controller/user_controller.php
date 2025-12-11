@@ -2,63 +2,88 @@
 class UsersController
 {
     private UsersModel $usersModel;
+
     public function __construct()
     {
-        $this->usersModel = UsersModel::getModel();
+        try {
+            $this->usersModel = UsersModel::getModel();
+        } catch (Exception $e) {
+            echo "<p><strong>Error initializing UsersController:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+        }
     }
+
     public function signin(): void
     {
-        $view = new loginView();
-        $view->display();
+        try {
+            $view = new loginView();
+            $view->display();
+        } catch (Exception $e) {
+            echo "<p><strong>Error displaying sign-in page:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+        }
     }
 
     public function login(): void
     {
-        $username = $_POST['username'] ?? '';
-        $password = $_POST['password'] ?? '';
+        try {
+            $username = $_POST['username'] ?? '';
+            $password = $_POST['password'] ?? '';
 
-        $user = $this->usersModel->verify($username, $password);
+            $user = $this->usersModel->verify($username, $password);
 
-        if ($user) {
-            session_start();
-            $_SESSION['username'] = $user['username'];
-            $_SESSION['user_id'] = $user['id'];
-            header('Location: ' . BASE_URL . '/index.php/users/dashboard');
-            exit();
-        } else {
-            $view = new loginView();
-            $view->display('Invalid username or password');
+            if ($user) {
+                session_start();
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['user_id'] = $user['id'];
+                header('Location: ' . BASE_URL . '/index.php/users/dashboard');
+                exit();
+            } else {
+                $view = new loginView();
+                $view->display('Invalid username or password');
+            }
 
+        } catch (Exception $e) {
+            echo "<p><strong>Error during login:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
         }
     }
 
-public function logout(): void{
-        session_start();
-        unset($_SESSION['username']);
-        unset($_SESSION['user_id']);
-        header('Location: ' . BASE_URL . '/index.php');
-        exit();
-}
+    public function logout(): void
+    {
+        try {
+            session_start();
+            unset($_SESSION['username']);
+            unset($_SESSION['user_id']);
+
+            header('Location: ' . BASE_URL . '/index.php');
+            exit();
+        } catch (Exception $e) {
+            echo "<p><strong>Error during logout:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+        }
+    }
 
     public function dashboard(): void
     {
-        session_start();
+        try {
+            session_start();
 
-        //pull the user id from the sessino
-        $user_id = $_SESSION['user_id'] ?? null;
+            $user_id = $_SESSION['user_id'] ?? null;
 
-        if (!$user_id) {
-            header('Location: ' . BASE_URL . '/index.php/users/signin');
-            exit();
+            if (!$user_id) {
+                header('Location: ' . BASE_URL . '/index.php/users/signin');
+                exit();
+            }
+
+            $user = $this->usersModel->getUserByID($user_id);
+
+            if (!$user) {
+                throw new Exception("User not found.");
+            }
+
+            $view = new dashboardView();
+            $view->display($user);
+
+        } catch (Exception $e) {
+            echo "<p><strong>Error loading dashboard:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
         }
-        $user = $this->usersModel->getUserByID($user_id);
-
-        if (!$user) {
-            echo "User not found!";
-            exit();
-        }
-
-        $view = new dashboardView();
-        $view->display($user);
     }
 }
+
