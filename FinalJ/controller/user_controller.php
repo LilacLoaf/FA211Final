@@ -36,7 +36,7 @@ public function logout(): void{
         session_start();
         unset($_SESSION['username']);
         unset($_SESSION['user_id']);
-        header('Location: ' . BASE_URL . '/index.php/users/signin');
+        header('Location: ' . BASE_URL . '/index.php');
         exit();
 }
 
@@ -61,8 +61,6 @@ public function logout(): void{
         $view = new dashboardView();
         $view->display($user);
     }
-
-
 
 
 

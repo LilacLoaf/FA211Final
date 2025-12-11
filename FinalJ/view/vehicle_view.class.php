@@ -8,7 +8,8 @@
 
 class VehicleView
 {
-    public function showSearchBar(): void{
+    public function showSearchBar(): void
+    {
         echo '<form method="get" action="' . BASE_URL . '/index.php/cars/searchCars" style="margin-bottom:20px;">';
         echo '<input type="text" name="query" placeholder="Search vehicles..." required>';
         echo '<button type="submit">Search</button>';
@@ -16,28 +17,40 @@ class VehicleView
     }
 
 
-    public function addVehicle(): void{
+    public function addVehicle(): void
+    {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        var_dump($_SESSION);
+
+        if (!empty($_SESSION['username'])) {
+            echo '<p><a href="' . BASE_URL . '/index.php/cars/addVehicleForm">Add Vehicle</a></p>';
+        } else {
+            echo '<p>Sign in to add a vehicle.</p>';
+        }
+    }
+
+    public function logoutButton(): void {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
 
         if (!empty($_SESSION['username'])) {
-            echo '<p><a href="' . BASE_URL . '/index.php/cars/addVehicleForm">Add Vehicle</a></p>';
-        }else{
-          echo '<p>Sign in to add a vehicle.</p>';
+            echo '<p><a href="' . BASE_URL . '/index.php/users/logout">Logout</a></p>';
+        }
     }
-    }
+
 
 
     // Displays all vehicles passed from the controller/model
     public function showAllVehicles($vehicles)
-    {    echo '<div>';
+    {
+        echo '<div>';
         $this->showSearchBar();
         $this->addVehicle();
+        $this->logoutButton();
 
-        if (!empty($_SESSION['username'])) {
-            echo '<p><a href="' . BASE_URL . '/index.php">Logout</a></p>';
-        }
 
         echo '</div>';
         // Table layout helps users quickly browse all products
@@ -83,7 +96,6 @@ class VehicleView
         // Navigation link helps users return to the full list
         echo "<a href='" . BASE_URL . "/index.php/cars/listCars'>Back to list</a>";
     }
-
 
 
 }
