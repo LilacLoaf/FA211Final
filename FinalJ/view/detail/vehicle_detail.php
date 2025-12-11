@@ -6,31 +6,49 @@
  * Description: displays the individual vehicle details when you click on a specific vehicle
  */
 
-// Loads the view class that will display the product details
 require_once "vehicle_view.class.php";
 
-// Ensures a valid product ID was provided
-if (!isset($_GET['id'])) {
-    echo "Vehicle ID is required.";
-    exit;
+try {
+    // Ensure vehicle ID is passed
+    if (!isset($_GET['id'])) {
+        throw new Exception("Vehicle ID is required.");
+    }
+
+    $id = intval($_GET['id']);
+
+    // ✅ Using your original connection line
+    $conn = new mysqli("localhost", "root", "", "rental_cars");
+    if ($conn->connect_error) {
+        throw new Exception("Database connection failed: " . $conn->connect_error);
+    }
+
+    // Prepare query to safely fetch vehicle
+    $stmt = $conn->prepare("SELECT * FROM vehicles WHERE id = ?");
+    if (!$stmt) {
+        throw new Exception("Failed to prepare SQL statement.");
+    }
+
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    if (!$result) {
+        throw new Exception("Failed to fetch vehicle.");
+    }
+
+    $vehicle = $result->fetch_assoc();
+    if (!$vehicle) {
+        throw new Exception("Vehicle not found.");
+    }
+
+    // Render view
+    $view = new VehicleView();
+    $view->showVehicleDetail($vehicle);
+
+    $conn->close();
+
+} catch (Exception $e) {
+    echo "<p><strong>Error:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
 }
+?>
 
-$id = intval($_GET['id']);
-
-// THIS IS TEMPORARY CHANGE THIS WHEN THE MODEL CONTROLLER ARE DONE
-$conn = new mysqli("localhost", "root", "", "rental_cars");
-if ($conn->connect_error) die("Database connection failed");
-
-// Prepared statement prevents invalid or unsafe input
-$stmt = $conn->prepare("SELECT * FROM vehicles WHERE id = ?");
-$stmt->bind_param("i", $id);
-$stmt->execute();
-$result = $stmt->get_result();
-$vehicle = $result->fetch_assoc();
-
-// Renders the full detail page using the view class
-$view = new VehicleView();
-$view->showVehicleDetail($vehicle);
-
-$conn->close();
 

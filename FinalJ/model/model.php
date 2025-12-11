@@ -12,86 +12,98 @@ class CarsModel {
     private mysqli $conn;
     private static ?CarsModel $_instance = null;
 
-    // table names
     private string $tblVehicles;
-//    private string $tblUsers;
-//    private string $tblJunction;
 
     private function __construct() {
+        try {
+            $this->db = Database::getDatabase();
+            $this->conn = $this->db->getConnection();
 
-        $this->db = Database::getDatabase();
-        $this->conn = $this->db->getConnection();
+            $this->tblVehicles = $this->db->getVehiclesTable();
 
-        // get table names from Database class
-        $this->tblVehicles = $this->db->getVehiclesTable();
-//        $this->tblUsers    = $this->db->getUsersTable();
-//        $this->tblJunction = $this->db->getJunctionTable();
-
-        foreach ($_POST as $key => $value) {
-            $_POST[$key] = $this->conn->real_escape_string($value);
-        }
-        foreach ($_GET as $key => $value) {
-            $_GET[$key] = $this->conn->real_escape_string($value);
+            foreach ($_POST as $key => $value) {
+                $_POST[$key] = $this->conn->real_escape_string($value);
+            }
+            foreach ($_GET as $key => $value) {
+                $_GET[$key] = $this->conn->real_escape_string($value);
+            }
+        } catch (Exception $e) {
+            echo "<p><strong>Error initializing CarsModel:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
         }
     }
 
-    public static function getModel(): CarsModel
-    {
+    public static function getModel(): CarsModel {
         if (self::$_instance === null) {
             self::$_instance = new CarsModel();
         }
         return self::$_instance;
     }
-    public function getCars(): array|false
-    {
-        $sql = "SELECT * FROM $this->tblVehicles";
-        $result = $this->conn->query($sql);
 
-        if (!$result) return false;
+    public function getCars(): array|false {
+        try {
+            $sql = "SELECT * FROM $this->tblVehicles";
+            $result = $this->conn->query($sql);
 
-        $vehicles = [];
-        while ($row = $result->fetch_assoc()) {
-            $vehicles[] = $row;
+            if (!$result) return false;
+
+            $vehicles = [];
+            while ($row = $result->fetch_assoc()) {
+                $vehicles[] = $row;
+            }
+            return $vehicles;
+        } catch (Exception $e) {
+            echo "<p><strong>Error fetching cars:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+            return false;
         }
-        return $vehicles;
     }
 
-    public function getCarByID($id): array|false
-    {
-        $sql = "SELECT * FROM $this->tblVehicles WHERE id='$id' LIMIT 1";
-        $result = $this->conn->query($sql);
+    public function getCarByID($id): array|false {
+        try {
+            $sql = "SELECT * FROM $this->tblVehicles WHERE id='$id' LIMIT 1";
+            $result = $this->conn->query($sql);
 
-        return ($result && $result->num_rows > 0)
-            ? $result->fetch_assoc()
-            : false;
+            return ($result && $result->num_rows > 0)
+                ? $result->fetch_assoc()
+                : false;
+        } catch (Exception $e) {
+            echo "<p><strong>Error fetching car by ID:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+            return false;
+        }
     }
 
     public function searchCars(string $query, string $mode = 'AND'): array {
-        $keywords = array_filter(explode(" ", trim($query)));
-        if (empty($keywords)) return [];
+        try {
+            $keywords = array_filter(explode(" ", trim($query)));
+            if (empty($keywords)) return [];
 
-        $connector = strtoupper($mode) === 'OR' ? 'OR' : 'AND';
+            $connector = strtoupper($mode) === 'OR' ? 'OR' : 'AND';
 
-        $where = array_map(function ($word) {
-            $word = $this->conn->real_escape_string($word);
-            return "(brand LIKE '%$word%'
-                 OR model LIKE '%$word%'
-                 OR licensePlate LIKE '%$word%')";
-        }, $keywords);
+            $where = array_map(function ($word) {
+                $word = $this->conn->real_escape_string($word);
+                return "(brand LIKE '%$word%' OR model LIKE '%$word%' OR licensePlate LIKE '%$word%')";
+            }, $keywords);
 
-        $sql = "SELECT * FROM $this->tblVehicles WHERE " . implode(" $connector ", $where);
-        $result = $this->conn->query($sql);
+            $sql = "SELECT * FROM $this->tblVehicles WHERE " . implode(" $connector ", $where);
+            $result = $this->conn->query($sql);
 
-        return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+            return $result ? $result->fetch_all(MYSQLI_ASSOC) : [];
+        } catch (Exception $e) {
+            echo "<p><strong>Error searching cars:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+            return [];
+        }
     }
 
-    public function insertCar(string $brand, string $model, string $licensePlate, string $status = 'Available'): bool
-    {
-        $stmt = $this->conn->prepare(
-            "INSERT INTO $this->tblVehicles (brand, model, licensePlate, status) VALUES (?, ?, ?, ?)"
-        );
-        $stmt->bind_param("ssss", $brand, $model, $licensePlate, $status);
-        return $stmt->execute();
+    public function insertCar(string $brand, string $model, string $licensePlate, string $status = 'Available'): bool {
+        try {
+            $stmt = $this->conn->prepare(
+                "INSERT INTO $this->tblVehicles (brand, model, licensePlate, status) VALUES (?, ?, ?, ?)"
+            );
+            $stmt->bind_param("ssss", $brand, $model, $licensePlate, $status);
+            return $stmt->execute();
+        } catch (Exception $e) {
+            echo "<p><strong>Error inserting car:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+            return false;
+        }
     }
-
 }
+
