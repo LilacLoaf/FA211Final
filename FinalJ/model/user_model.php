@@ -2,37 +2,36 @@
 /**
  * Author: Jonathan Nguyen
  * Date: 12/4/2025
- * File: user_model.php
- * Description: Users Model
+ * File: model.php
+ * Description: Cars Model (Singleton) - Works with Database Singleton
  */
 
 class UsersModel
 {
+
     private Database $db;
     private mysqli $conn;
     private static ?UsersModel $_instance = null;
 
+    // table names
     private string $tblUsers;
     private string $tblJunction;
 
     private function __construct()
     {
-        try {
-            $this->db = Database::getDatabase();
-            $this->conn = $this->db->getConnection();
 
-            $this->tblUsers    = $this->db->getUsersTable();
-            $this->tblJunction = $this->db->getJunctionTable();
+        $this->db = Database::getDatabase();
+        $this->conn = $this->db->getConnection();
 
-            foreach ($_POST as $key => $value) {
-                $_POST[$key] = $this->conn->real_escape_string($value);
-            }
-            foreach ($_GET as $key => $value) {
-                $_GET[$key] = $this->conn->real_escape_string($value);
-            }
+        // get table names from Database class
+        $this->tblUsers = $this->db->getUsersTable();
+        $this->tblJunction = $this->db->getJunctionTable();
 
-        } catch (Exception $e) {
-            echo "<p><strong>Error initializing UsersModel:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+        foreach ($_POST as $key => $value) {
+            $_POST[$key] = $this->conn->real_escape_string($value);
+        }
+        foreach ($_GET as $key => $value) {
+            $_GET[$key] = $this->conn->real_escape_string($value);
         }
     }
 
@@ -44,94 +43,61 @@ class UsersModel
         return self::$_instance;
     }
 
+    //basically replaced all the cars functions with users commands
+
+
+    //would list all users if we need that later
     public function getUsers(): array|false
     {
-        try {
-            $sql = "SELECT * FROM $this->tblUsers";
-            $result = $this->conn->query($sql);
+        $sql = "SELECT * FROM $this->tblUsers";
+        $result = $this->conn->query($sql);
 
-            if (!$result) return false;
+        if (!$result) return false;
 
-            $users = [];
-            while ($row = $result->fetch_assoc()) {
-                $users[] = $row;
-            }
-            return $users;
-
-        } catch (Exception $e) {
-            echo "<p><strong>Error fetching users:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
-            return false;
+        $users = [];
+        while ($row = $result->fetch_assoc()) {
+            $users[] = $row;
         }
+        return $users;
     }
 
+
+    //get the individual user for login later
     public function getUserByID($id): array|false
     {
-        try {
-            $sql = "SELECT * FROM $this->tblUsers WHERE id='$id' LIMIT 1";
-            $result = $this->conn->query($sql);
+        $sql = "SELECT * FROM $this->tblUsers WHERE id='$id' LIMIT 1";
+        $result = $this->conn->query($sql);
 
-            return ($result && $result->num_rows > 0)
-                ? $result->fetch_assoc()
-                : false;
-
-        } catch (Exception $e) {
-            echo "<p><strong>Error fetching user by ID:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
-            return false;
-        }
+        return ($result && $result->num_rows > 0)
+            ? $result->fetch_assoc()
+            : false;
     }
 
+//create a new user
     public function insertUser(string $name, string $email, string $phone, string $address, string $username, string $password): bool
     {
-        try {
-            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+        // hash password
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
 
-            $stmt = $this->conn->prepare(
-                "INSERT INTO $this->tblUsers (name, email, phone, address, username, password) VALUES (?, ?, ?, ?, ?, ?)"
-            );
+        $stmt = $this->conn->prepare(
+            "INSERT INTO $this->tblUsers (name, email, phone, address, username, password) Values (?, ?, ?, ?, ?, ?)"
+        );
+        $stmt->bind_param("ssssss", $name, $email, $phone, $address, $username, $hashedPassword);
 
-            if (!$stmt) {
-                throw new Exception("Failed to prepare user insert statement.");
-            }
-
-            $stmt->bind_param("ssssss", $name, $email, $phone, $address, $username, $hashedPassword);
-            return $stmt->execute();
-
-        } catch (Exception $e) {
-            echo "<p><strong>Error inserting user:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
-            return false;
-        }
+        return $stmt->execute();
     }
 
     public function verify(string $username, string $password): array|false
     {
-        try {
-            $sql = "SELECT * FROM $this->tblUsers WHERE username=? LIMIT 1";
-            $stmt = $this->conn->prepare($sql);
+        $sql = "SELECT * FROM $this->tblUsers WHERE username=? AND password=? LIMIT 1";
+        $stmt = $this->conn->prepare($sql);
+        $stmt->bind_param("ss", $username, $password);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-            if (!$stmt) {
-                throw new Exception("Failed to prepare login query.");
-            }
-
-            $stmt->bind_param("s", $username);
-            $stmt->execute();
-            $result = $stmt->get_result();
-
-            if (!$result || $result->num_rows !== 1) {
-                return false;
-            }
-
-            $user = $result->fetch_assoc();
-
-            // Validate password
-            if (password_verify($password, $user['password'])) {
-                return $user;
-            }
-
-            return false;
-
-        } catch (Exception $e) {
-            echo "<p><strong>Error verifying user credentials:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
-            return false;
+        if ($result && $result->num_rows === 1) {
+            return $result->fetch_assoc();
         }
+        return false;
     }
 }
