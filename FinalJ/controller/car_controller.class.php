@@ -21,21 +21,6 @@ class CarsController{
         $view = new VehicleView();
         $view->showAllVehicles($vehicles);
     }
-    //get the users table
-    public function listUsers()
-    {
-        $getUsers = $this->carsModel->getUsers();
-
-        $view = new userIndex();
-        $view->display($getUsers);
-    }
-    //get the junction table (the extra table)
-//    public function listJunction(){
-//        $getJunction = $this->carsModel->getJunction();
-//
-//        $view = new junctionIndex();
-//        $view->display($getJunction);
-//    }
 
     //get the car details using its id and send the page into a acr detail page
     public function listCarByID($id){
@@ -46,31 +31,40 @@ class CarsController{
 
     }
 
-    //get the junction table's details.
-    public function listJunctionByID($id){
-        $junction = $this->carsModel->getJunctionByID($id);
-
-        $view = new junctionDetail();
-        $view->display($junction);
-    }
-
-    //get the user table's details
-    public function listUserByID($id){
-        $user = $this->carsModel->getUserByID($id);
-
-        $view = new userDetail();
-        $view->display($user);
-    }
-
     public function searchCars()
     {
         $query = $_GET['query'] ?? '';
-
         $results = $this->carsModel->searchCars($query);
 
         $view = new carSearchResults();
-
         $view->display($results);
     }
 
+    public function addCar(): void
+    {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $brand = $_POST['brand'] ?? '';
+            $model = $_POST['model'] ?? '';
+            $licensePlate = $_POST['licensePlate'] ?? '';
+            $status = $_POST['status'] ?? 'Available';
+
+            if ($brand && $model && $licensePlate) {
+                $this->carsModel->insertCar($brand, $model, $licensePlate, $status);
+
+                header('Location: ' . BASE_URL . '/index.php/cars/listCars');
+                exit();
+            } else {
+                $error = "Please fill in all required fields.";
+            }
+        }
+
+        $view = new addVehicle();
+        $view->display($error ?? null);
+    }
+
+    public function addVehicleForm(): void
+    {
+        $view = new addVehicle();
+        $view->display();
+    }
 }

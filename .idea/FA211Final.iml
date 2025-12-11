@@ -2,6 +2,8 @@
 <module type="WEB_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/FinalJ/spec" isTestSource="true" />
+      <excludeFolder url="file://$MODULE_DIR$/FinalJ/vendor/composer" />
       <excludeFolder url="file://$MODULE_DIR$/Nicks/Final/vendor/composer" />
     </content>
     <orderEntry type="inheritedJdk" />

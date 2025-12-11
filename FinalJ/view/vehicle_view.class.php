@@ -8,37 +8,53 @@
 
 class VehicleView
 {
-
-    //make a search bar at the top.
-    public function showSearchBar(): void
-    {
+    public function showSearchBar(): void{
         echo '<form method="get" action="' . BASE_URL . '/index.php/cars/searchCars" style="margin-bottom:20px;">';
         echo '<input type="text" name="query" placeholder="Search vehicles..." required>';
         echo '<button type="submit">Search</button>';
         echo '</form>';
     }
 
+
+    public function addVehicle(): void{
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+
+        if (!empty($_SESSION['username'])) {
+            echo '<p><a href="' . BASE_URL . '/index.php/cars/addVehicleForm">Add Vehicle</a></p>';
+        }else{
+          echo '<p>Sign in to add a vehicle.</p>';
+    }
+    }
+
+
     // Displays all vehicles passed from the controller/model
     public function showAllVehicles($vehicles)
-    {
+    {    echo '<div>';
+        $this->showSearchBar();
+        $this->addVehicle();
+
+        if (!empty($_SESSION['username'])) {
+            echo '<p><a href="' . BASE_URL . '/index.php">Logout</a></p>';
+        }
+
+        echo '</div>';
         // Table layout helps users quickly browse all products
         echo "<h2>All Vehicles</h2><table border='1' cellpadding='10'>";
-        $this->showSearchBar();
         echo "<tr><th>ID</th><th>Brand</th><th>Model</th><th>License Plate</th><th>Status</th><th>Action</th></tr>";
 
         // Loop shows each product on its own row to keep UI simple
         foreach ($vehicles as $v) {
             echo "<tr>
                 <td>{$v['id']}</td>
+                
                 <td>{$v['brand']}</td>
                 <td>{$v['model']}</td>
                 <td>{$v['licensePlate']}</td>
                 <td>{$v['status']}</td>
                 <td><a href='" . BASE_URL . "/index.php/cars/listCarByID/{$v['id']}'>View</a></td>
                 <!-- Link allows user to view details of this vehicle -->
-
-
-
             </tr>";
         }
 
@@ -66,8 +82,10 @@ class VehicleView
 
         // Navigation link helps users return to the full list
         echo "<a href='" . BASE_URL . "/index.php/cars/listCars'>Back to list</a>";
-
     }
+
+
+
 }
 
 

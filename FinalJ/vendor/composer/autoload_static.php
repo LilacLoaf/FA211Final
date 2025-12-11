@@ -4,27 +4,32 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit9ce0ac2ed7b7dd5ca1435cadb0662905
+class ComposerStaticInita142e310bc38865ae945454927a8fbd5
 {
     public static $classMap = array (
         'CarsController' => __DIR__ . '/../..' . '/controller/car_controller.class.php',
         'CarsModel' => __DIR__ . '/../..' . '/model/model.php',
-        'ComposerAutoloaderInit9ce0ac2ed7b7dd5ca1435cadb0662905' => __DIR__ . '/..' . '/composer/autoload_real.php',
+        'ComposerAutoloaderInita142e310bc38865ae945454927a8fbd5' => __DIR__ . '/..' . '/composer/autoload_real.php',
         'Composer\\Autoload\\ClassLoader' => __DIR__ . '/..' . '/composer/ClassLoader.php',
-        'Composer\\Autoload\\ComposerStaticInit9ce0ac2ed7b7dd5ca1435cadb0662905' => __DIR__ . '/..' . '/composer/autoload_static.php',
+        'Composer\\Autoload\\ComposerStaticInita142e310bc38865ae945454927a8fbd5' => __DIR__ . '/..' . '/composer/autoload_static.php',
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'Database' => __DIR__ . '/../..' . '/config/database.php',
         'Dispatcher' => __DIR__ . '/../..' . '/config/dispatcher.php',
+        'UsersController' => __DIR__ . '/../..' . '/controller/user_controller.php',
+        'UsersModel' => __DIR__ . '/../..' . '/model/user_model.php',
         'VehicleView' => __DIR__ . '/../..' . '/view/vehicle_view.class.php',
         'WelcomeController' => __DIR__ . '/../..' . '/controller/welcome_controller.php',
-        'WelcomeView' => __DIR__ . '/../..' . '/view/welcome_index_class.php',
-        'carSearchResults' => __DIR__ . '/../..' . '/view/search_results.php',
+        'WelcomeView' => __DIR__ . '/../..' . '/view/index/welcome_index_class.php',
+        'addVehicle' => __DIR__ . '/../..' . '/view/create/addCarForm.php',
+        'carSearchResults' => __DIR__ . '/../..' . '/view/search/search_results.php',
+        'dashboardView' => __DIR__ . '/../..' . '/view/dashboard/dashboard_view.php',
+        'loginView' => __DIR__ . '/../..' . '/view/login/login_view.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit9ce0ac2ed7b7dd5ca1435cadb0662905::$classMap;
+            $loader->classMap = ComposerStaticInita142e310bc38865ae945454927a8fbd5::$classMap;
 
         }, null, ClassLoader::class);
     }
