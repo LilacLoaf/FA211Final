@@ -1,6 +1,6 @@
 <?php
 $message = $message ?? "An unknown error occurred.";
-?
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -30,9 +30,7 @@ $message = $message ?? "An unknown error occurred.";
 <div class="error-container">
     <h1>Error</h1>
     <p><?= htmlspecialchars($message) ?></p>
-    <a href="/index.php">Back to Home</a>
+<a href="/index.php">Back to Home</a>
 </div>
 </body>
 </html>
-
-
