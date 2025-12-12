@@ -11,14 +11,15 @@ class carSearchResults
     // Accepts an array of vehicles and outputs the table
     public function display(array $vehicles): void
     {
-        if (empty($vehicles)) {
-            echo "<p>No results found.</p>";
-            return;
-        }
+        try {
+            if (empty($vehicles)) {
+                echo "<p>No results found.</p>";
+                return;
+            }
 
-        echo "<h3>Search Results:</h3>";
-        echo "<table border='1' cellpadding='8'>";
-        echo "<tr>
+            echo "<h3>Search Results:</h3>";
+            echo "<table border='1' cellpadding='8'>";
+            echo "<tr>
                 <th>Brand</th>
                 <th>Model</th>
                 <th>License Plate</th>
@@ -26,8 +27,8 @@ class carSearchResults
                 <th>View</th>
               </tr>";
 
-        foreach ($vehicles as $vehicle) {
-            echo "<tr>
+            foreach ($vehicles as $vehicle) {
+                echo "<tr>
                     <td><a href='" . BASE_URL . "/index.php/cars/listCarByID/{$vehicle['id']}'>
                         {$vehicle['brand']}
                     </a></td>
@@ -38,10 +39,13 @@ class carSearchResults
                         <a href='" . BASE_URL . "/index.php/cars/listCarByID/{$vehicle['id']}'>View</a>
                     </td>
                   </tr>";
-        }
+            }
 
-        echo "</table>";
-    }
+            echo "</table>";
+        } catch (Exception $e) {
+            echo "<p><strong>Error with search</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
+        }
+}
 }
 ?>
 

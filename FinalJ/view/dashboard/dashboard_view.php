@@ -2,7 +2,9 @@
 class dashboardView {
 
     public function display(array $user): void
-    {
+    { try {
+
+
         echo '<h2>Welcome to your account!</h2>';
 
         echo '<h4>Your account information:</h4>';
@@ -18,6 +20,9 @@ class dashboardView {
         echo '<p><a href="' . BASE_URL . '/index.php/users/logout">Logout</a></p>';
 
         //could add edit and add features if we need to
+    } catch (Exception $e) {
+        echo "<p><strong>Error loading cars:</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
     }
+}
 }
 

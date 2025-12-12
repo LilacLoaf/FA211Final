@@ -8,7 +8,7 @@
 class WelcomeView
 {
     public function display(): void
-    {
+    { try {
         ?>
         <!DOCTYPE html>
         <html lang="en">
@@ -27,6 +27,9 @@ class WelcomeView
         </body>
         </html>
         <?php
+    } catch (Exception $e) {
+        echo "<p><strong>Error loading</strong> " . htmlspecialchars($e->getMessage()) . "</p>";
     }
+}
 }
 ?>
